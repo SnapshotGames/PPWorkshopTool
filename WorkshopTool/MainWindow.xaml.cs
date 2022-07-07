@@ -178,7 +178,7 @@ namespace WorkshopTool
 				warning,
 				"Remove Workshop Item",
 				MessageBoxButton.YesNo,
-				MessageBoxImage.Warning);
+				MessageBoxImage.Question);
 
 			if (result == MessageBoxResult.No) {
 				return;
@@ -377,6 +377,8 @@ namespace WorkshopTool
 			
 			if (workshopItemWithoutProjectSelected) {
 				SelectItemWithId(selectedItem.FileId);
+			} else {
+				SelectItemWithProjectPath(newItem.ProjectPath);
 			}
 		}
 		
@@ -427,7 +429,82 @@ namespace WorkshopTool
 				SelectItemWithId(workshopItem.FileId);
 			}
 		}
+		
+		private async void MenuItem_OnClickAddModProjectToList(object sender, RoutedEventArgs e)
+		{
+			var dialog = new AddProjectToListWindow();
+			bool result = dialog.ShowDialog() ?? false;
 
+			if (!result) {
+				return;
+			}
+
+			// Check to see if we already have this project in the list
+			string normProjectPath = App.NormalizePath(dialog.ProjectPath);
+			
+			foreach (ListViewItem lvItem in LvModsList.Items) {
+				WorkshopItem workshopItem = lvItem.WorkshopItem;
+				
+				if (workshopItem.FileId == 0 &&
+				    normProjectPath == App.NormalizePath(workshopItem.ProjectPath)) 
+				{
+					MessageBox.Show(
+						this,
+						"The project is already in the list.",
+						"Existing Project",
+						MessageBoxButton.OK,
+						MessageBoxImage.Exclamation);
+
+					LvModsList.Focus();
+					LvModsList.SelectedItem = lvItem;
+					LvModsList.ScrollIntoView(lvItem);
+					return;
+				}
+			}
+			
+			App.LocalAppData.WorkshopItems.Add(new WorkshopItem {
+				Title = App.GetProjectTitle(dialog.ProjectPath),
+				ProjectPath = dialog.ProjectPath,
+			});
+			
+			App.WriteLocalData();
+			await RefreshWorkshopItems();
+			SelectItemWithProjectPath(dialog.ProjectPath);
+		}
+
+		private async void MenuItem_OnClickSetModProjectToWorkshopItem(object sender, RoutedEventArgs e)
+		{
+			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
+
+			if (workshopItem == null || workshopItem.FileId == 0) {
+				MessageBox.Show(
+					this,
+					"You must select a Workshop Item from the list (ID column contains a number)",
+					"Missing Workshop Item",
+					MessageBoxButton.OK,
+					MessageBoxImage.Exclamation);
+				
+				return;
+			}
+			
+			var dialog = new AddProjectToListWindow {
+				WorkshopItemTitle = workshopItem.Title,
+				ProjectPath = workshopItem.ProjectPath,
+			};
+
+			bool result = dialog.ShowDialog() ?? false;
+
+			if (!result) {
+				return;
+			}
+
+			workshopItem.ProjectPath = dialog.ProjectPath;
+			App.WriteLocalData();
+			await RefreshWorkshopItems();
+			SelectItemWithId(workshopItem.FileId);
+		}
+
+		
 		private void Menu_OnClickOpenModProject(object sender, RoutedEventArgs e)
 		{
 			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
@@ -504,6 +581,28 @@ namespace WorkshopTool
 			}
 		}
 
+		private void Menu_OnClickRemoveTestMod(object sender, RoutedEventArgs e)
+		{
+			MessageBoxResult result = MessageBox.Show(
+				this,
+				"Remove the mod you are currently testing from the game?",
+				"Remove Test Mod",
+				MessageBoxButton.YesNo,
+				MessageBoxImage.Question);
+
+			if (result == MessageBoxResult.No) {
+				return;
+			}
+
+			App.RemoveTestMod();
+			MessageBox.Show(
+				this,
+				"Test mod removed from the game",
+				"Remove Test Mod",
+				MessageBoxButton.OK,
+				MessageBoxImage.Information);
+		}
+		
 		private void LvModsList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			if (e.ChangedButton != MouseButton.Left) {
@@ -534,7 +633,23 @@ namespace WorkshopTool
 				}
 			}
 		}
-		
+
+		private void SelectItemWithProjectPath(string projectPath)
+		{
+			string normProjectPath = App.NormalizePath(projectPath);
+
+			foreach (ListViewItem lvItem in LvModsList.Items) {
+				if (lvItem.WorkshopItem.FileId == 0 &&
+				    App.NormalizePath(lvItem.WorkshopItem.ProjectPath) == normProjectPath) 
+				{
+					LvModsList.Focus();
+					LvModsList.SelectedItem = lvItem;
+					LvModsList.ScrollIntoView(lvItem);
+					break;
+				}
+			}
+		}
+
 		#region IProgress<int> implementation
 
 		private string _asyncOpName;
@@ -559,6 +674,5 @@ namespace WorkshopTool
 		}
 
 		#endregion
-		
 	}
 }

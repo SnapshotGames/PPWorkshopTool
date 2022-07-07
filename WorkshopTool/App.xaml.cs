@@ -19,23 +19,25 @@ namespace WorkshopTool
 	/// </summary>
 	public partial class App : Application
 	{
-		public static string PhoenixPointAppInstallDir { get; private set; }
-		public static string LocalDataPath { get; private set; }
-
 		public static readonly string DefaultProjectPath = 
 			Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
 		public static readonly string DefaultAuthor = Environment.UserName;
+		public static readonly string ModMetaJsonPath = "meta.json";
 		
 		public const int PhoenixPointAppSteamId = 839770;
 		public const int WorkshopToolSteamId = 1996080;
 		
 		public static LocalAppData LocalAppData { get; private set; }
-		
+
 		private static readonly ILog Log = LogManager.GetLogger(typeof(App));
-		private static readonly string LocalDataPathExt = "Snapshot Games Inc/Phoenix Point/Steam/WorkshopTool/Data.xml";
+		private static readonly string LocalLowPath = 
+			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+				.Replace("Roaming","LocalLow");
+		private static readonly string DataPath = Path.Combine(LocalLowPath, "Snapshot Games Inc\\Phoenix Point\\Steam\\WorkshopTool");
+		private static readonly string LocalDataFile = Path.Combine(DataPath, "Data.xml");
+		private static readonly string TestModPath = Path.Combine(DataPath, "TestMod");
 		private static readonly string TemplateProjectPath = "NewMod";
-		private static readonly string ModMetaJsonPath = "meta.json";
 		private static readonly string[] ExtensionsToReplaceProjectName = { ".cs", ".csproj", ".json", ".sln", ".txt" };
 		private static readonly string[] FileNamesToIgnore = { "msbuildcantcopyemptydirs" };
 		
@@ -58,16 +60,6 @@ namespace WorkshopTool
 				Shutdown();
 				return;
 			}
-
-			if (SteamApps.IsSubscribedToApp(PhoenixPointAppSteamId)) {
-				PhoenixPointAppInstallDir = SteamApps.AppInstallDir(PhoenixPointAppSteamId);
-			}
-
-			string localLowPath = 
-				Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-					.Replace("Roaming","LocalLow");
-
-			LocalDataPath = Path.Combine(localLowPath, LocalDataPathExt);
 			
 			try {
 				LocalAppData = ReadLocalData();
@@ -113,16 +105,16 @@ namespace WorkshopTool
 			XmlSerializer ser = new XmlSerializer(typeof(LocalAppData));
 
 			try {
-				String dirName = Path.GetDirectoryName(LocalDataPath) ??
-				                 throw new InvalidOperationException($"Invalid directory name: {LocalDataPath}");
+				String dirName = Path.GetDirectoryName(LocalDataFile) ??
+				                 throw new InvalidOperationException($"Invalid directory name: {LocalDataFile}");
 
 				Directory.CreateDirectory(dirName);
 
-				using (TextWriter writer = new StreamWriter(LocalDataPath)) {
+				using (TextWriter writer = new StreamWriter(LocalDataFile)) {
 					ser.Serialize(writer, LocalAppData);
 				}
 			} catch (Exception e) {
-				Log.Error($"Cannot write local data to: {LocalDataPath}", e);
+				Log.Error($"Cannot write local data to: {LocalDataFile}", e);
 			}
 		}
 		
@@ -208,13 +200,13 @@ namespace WorkshopTool
 
 		private static LocalAppData ReadLocalData()
 		{
-			if (!File.Exists(LocalDataPath)) {
+			if (!File.Exists(LocalDataFile)) {
 				return null;
 			}
 			
 			XmlSerializer ser = new XmlSerializer(typeof(LocalAppData));
 
-			using (TextReader reader = new StreamReader(LocalDataPath)) {
+			using (TextReader reader = new StreamReader(LocalDataFile)) {
 				return (LocalAppData) ser.Deserialize(reader);
 			}
 		}
@@ -250,6 +242,23 @@ namespace WorkshopTool
 		public static string GetProjectDistDirectory(string projectDir)
 		{
 			return Path.Combine(projectDir, "Dist");
+		}
+		
+		public static string NormalizePath(string path)
+		{
+			return Path.GetFullPath(path)
+				.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+				.ToLowerInvariant();
+		}
+
+		public static string GetProjectTitle(string projectPath)
+		{
+			return "<Unknown>";
+		}
+
+		public static void RemoveTestMod()
+		{
+			Directory.Delete(TestModPath, recursive: true);
 		}
 	}
 }

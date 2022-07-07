@@ -26,10 +26,13 @@
 			<MenuItem Header="_Project">
 				<MenuItem Header="_New Mod Project..." Click="Menu_OnClickNewModProject"/>
 				<MenuItem Header="_Remove Mod Project" Click="MenuItem_OnClickRemoveModProject"/>
-				<MenuItem Header="_Associate Project With Workshop Item..." />
+				<MenuItem Header="_Add Mod Project To List..." Click="MenuItem_OnClickAddModProjectToList"/>
+				<MenuItem Header="_Set Mod Project To Workshop Item..." Click="MenuItem_OnClickSetModProjectToWorkshopItem"/>
 				<Separator />
 				<MenuItem Header="_Open Mod Project" Click="Menu_OnClickOpenModProject"/>
-				<MenuItem Header="_Open Mod Project in Explorer" Click="Menu_OnClickOpenModProjectInExplorer"/>
+				<MenuItem Header="Open Mod Project in _Explorer" Click="Menu_OnClickOpenModProjectInExplorer"/>
+				<Separator />
+				<MenuItem Header="Remove _Test Mod" Click="Menu_OnClickRemoveTestMod"/>
 			</MenuItem>
 			<MenuItem Header="_Help">
 				<MenuItem Header="_Help"/>
