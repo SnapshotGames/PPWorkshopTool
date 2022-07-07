@@ -1,0 +1,24 @@
+﻿{
+  "ID": "{Id}",
+  "AssemblyName": "{AssemblyName}",
+  "Author": [
+    {
+      "Key": "English",
+      "Value": "{Author}"
+    }
+  ],
+  "Version": "1.0",
+  "Name": [
+    {
+      "Key": "English",
+      "Value": "{Name}"
+    }
+  ],
+  "Description": [
+    {
+      "Key": "English",
+      "Value": "{Description}"
+    }
+  ],
+  "Dependencies": []
+}

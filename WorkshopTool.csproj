@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net46</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>UI_Misc_DefaultIcon_PPLogo_transparent.ico</ApplicationIcon>
+        <Company>Snapshot Games</Company>
+        <Product>Steam Workshop Tool</Product>
+        <AssemblyVersion>1.0</AssemblyVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="log4net" Version="2.0.14" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="steam_api64.dll" />
+      <Content Include="steam_api64.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="App.config">
+        <SubType>Designer</SubType>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Facepunch.Steamworks.Win64">
+        <HintPath>Facepunch.Steamworks\Facepunch.Steamworks.Win64.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Windows.Forms" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Remove="NewMod\**" />
+      <Content Include="NewMod\**">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>
