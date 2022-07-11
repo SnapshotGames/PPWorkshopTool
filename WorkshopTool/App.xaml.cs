@@ -31,6 +31,7 @@ namespace WorkshopTool
 		public static LocalAppData LocalAppData { get; private set; }
 
 		private static readonly ILog Log = LogManager.GetLogger(typeof(App));
+		private static readonly string GameProcessName = "PhoenixPointWin64";
 		private static readonly string LocalLowPath = 
 			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
 				.Replace("Roaming","LocalLow");
@@ -233,12 +234,16 @@ namespace WorkshopTool
 			
 			Process.Start(projectPath);
 		}
-		
-		public static void LaunchGame()
+
+		public static void RestartGame()
 		{
+			foreach (Process process in Process.GetProcessesByName(GameProcessName)) {
+				process.Kill();
+			}
+			
 			Process.Start($"steam://run/{PhoenixPointAppSteamId}");
 		}
-		
+
 		public static string GetProjectDistDirectory(string projectDir)
 		{
 			return Path.Combine(projectDir, "Dist");
@@ -258,7 +263,11 @@ namespace WorkshopTool
 
 		public static void RemoveTestMod()
 		{
-			Directory.Delete(TestModPath, recursive: true);
+			try {
+				Directory.Delete(TestModPath, recursive: true);
+			} catch (DirectoryNotFoundException) {
+				// Do nothing
+			}
 		}
 	}
 }

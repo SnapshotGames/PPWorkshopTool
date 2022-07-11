@@ -17,21 +17,22 @@
 				<MenuItem Header="_New Workshop Item..." Click="Menu_OnClickNewWorkshopItem"/>
 				<MenuItem Header="_Remove Workshop Item" Click="MenuItem_OnClickRemoveWorkshopItem"/>
 				<Separator />
-				<MenuItem Header="_Refresh Workshop Items..." Click="Menu_OnClickRefreshWorkshopItems"/>
+				<MenuItem Header="_Refresh List" Click="Menu_OnClickRefreshWorkshopItems"/>
 				<MenuItem Header="_Upload Data to Workshop..." Click="MenuItem_OnClickUploadDataToWorkshop"/>
-				<MenuItem Header="_Open Workshop Item in Steam..." Click="Menu_OnClickOpenWorkshopItemInSteam"/>
+				<MenuItem Header="_Open Workshop Item in Steam" Click="Menu_OnClickOpenWorkshopItemInSteam"/>
 				<Separator />
 				<MenuItem Header="_Exit" Click="Menu_OnClickExit"/>
 			</MenuItem>
 			<MenuItem Header="_Project">
 				<MenuItem Header="_New Mod Project..." Click="Menu_OnClickNewModProject"/>
 				<MenuItem Header="_Remove Mod Project" Click="MenuItem_OnClickRemoveModProject"/>
-				<MenuItem Header="_Add Mod Project To List..." Click="MenuItem_OnClickAddModProjectToList"/>
+				<MenuItem Header="_Add Add Existing Mod Project To List..." Click="MenuItem_OnClickAddModProjectToList"/>
 				<MenuItem Header="_Set Mod Project To Workshop Item..." Click="MenuItem_OnClickSetModProjectToWorkshopItem"/>
 				<Separator />
 				<MenuItem Header="_Open Mod Project" Click="Menu_OnClickOpenModProject"/>
 				<MenuItem Header="Open Mod Project in _Explorer" Click="Menu_OnClickOpenModProjectInExplorer"/>
 				<Separator />
+				<MenuItem Header="(Re)Start the _Game" Click="MenuItem_OnClickRestartGame"/>
 				<MenuItem Header="Remove _Test Mod" Click="Menu_OnClickRemoveTestMod"/>
 			</MenuItem>
 			<MenuItem Header="_Help">
@@ -59,6 +60,9 @@
 					<GridViewColumn Header="Project Path" Width="330" DisplayMemberBinding="{Binding LvProjectPath}"/>
 				</GridView>
 			</ListView.View>
+			<ListView.ContextMenu>
+				<ContextMenu Name="CmListViewContextMenu" Opened="CmListViewContextMenu_OnOpened" StaysOpen="true" />
+			</ListView.ContextMenu>
 		</ListView>
 		
 	</DockPanel>

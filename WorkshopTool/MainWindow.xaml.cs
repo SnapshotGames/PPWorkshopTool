@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using log4net;
 using Steamworks;
@@ -34,7 +35,8 @@ namespace WorkshopTool
 			if (!SteamClient.IsValid) {
 				return;
 			}
-	
+
+			InitializeComponent();
 			Dispatcher.BeginInvoke(new Func<Task>(RefreshWorkshopItems));
 		}
 
@@ -503,7 +505,6 @@ namespace WorkshopTool
 			await RefreshWorkshopItems();
 			SelectItemWithId(workshopItem.FileId);
 		}
-
 		
 		private void Menu_OnClickOpenModProject(object sender, RoutedEventArgs e)
 		{
@@ -581,6 +582,22 @@ namespace WorkshopTool
 			}
 		}
 
+		private void MenuItem_OnClickRestartGame(object sender, RoutedEventArgs e)
+		{
+			MessageBoxResult result = MessageBox.Show(
+				this,
+				"This will kill the current running instance of the game (if running) and will start it again. Do you want to continue?",
+				"(Re)Start the Game",
+				MessageBoxButton.YesNo,
+				MessageBoxImage.Question);
+
+			if (result == MessageBoxResult.No) {
+				return;
+			}
+			
+			App.RestartGame();
+		}
+
 		private void Menu_OnClickRemoveTestMod(object sender, RoutedEventArgs e)
 		{
 			MessageBoxResult result = MessageBox.Show(
@@ -597,12 +614,97 @@ namespace WorkshopTool
 			App.RemoveTestMod();
 			MessageBox.Show(
 				this,
-				"Test mod removed from the game",
+				"Test mod removed from the game. You need to restart the game for the mod to disappear from the list.",
 				"Remove Test Mod",
 				MessageBoxButton.OK,
 				MessageBoxImage.Information);
 		}
 		
+		private void CmListViewContextMenu_OnOpened(object sender, RoutedEventArgs e)
+		{
+			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
+			bool itemSelected = workshopItem != null;
+			bool workshopItemSelected = itemSelected && workshopItem.FileId != 0;
+			bool modProjectSelected = itemSelected && workshopItem.ProjectPath != null;
+			
+			ItemCollection contextMenuItems = CmListViewContextMenu.Items;
+			contextMenuItems.Clear();
+			MenuItem mi;
+			
+			mi = new MenuItem();
+			mi.Header = "_Refresh List";
+			mi.Click += Menu_OnClickRefreshWorkshopItems;
+			contextMenuItems.Add(mi);
+
+			mi = new MenuItem();
+			mi.Header = "_New Workshop Item...";
+			mi.Click += Menu_OnClickNewWorkshopItem;
+			contextMenuItems.Add(mi);
+
+			if (workshopItemSelected) {
+				mi = new MenuItem();
+				mi.Header = "_Remove Workshop Item";
+				mi.Click += MenuItem_OnClickRemoveWorkshopItem;
+				contextMenuItems.Add(mi);
+				
+				mi = new MenuItem();
+				mi.Header = "_Set Mod Project To Workshop Item...";
+				mi.Click += MenuItem_OnClickSetModProjectToWorkshopItem;
+				contextMenuItems.Add(mi);
+				
+				mi = new MenuItem();
+				mi.Header = "_Upload Data to Workshop";
+				mi.Click += MenuItem_OnClickUploadDataToWorkshop;
+				contextMenuItems.Add(mi);
+				
+				mi = new MenuItem();
+				mi.Header = "_Open Workshop Item in Steam";
+				mi.Click += Menu_OnClickOpenWorkshopItemInSteam;
+				contextMenuItems.Add(mi);
+			}
+
+			contextMenuItems.Add(new Separator());
+			
+			mi = new MenuItem();
+			mi.Header = "_New Mod Project...";
+			mi.Click += Menu_OnClickNewModProject;
+			contextMenuItems.Add(mi);
+
+			mi = new MenuItem();
+			mi.Header = "_Add Existing Mod Project To List...";
+			mi.Click += MenuItem_OnClickAddModProjectToList;
+			contextMenuItems.Add(mi);
+
+			if (modProjectSelected) {
+				mi = new MenuItem();
+				mi.Header = "_Remove Mod Project";
+				mi.Click += MenuItem_OnClickRemoveModProject;
+				contextMenuItems.Add(mi);
+				
+				mi = new MenuItem();
+				mi.Header = "Open Mod Project in _Explorer";
+				mi.Click += Menu_OnClickOpenModProjectInExplorer;
+				contextMenuItems.Add(mi);
+			}
+			
+			contextMenuItems.Add(new Separator());
+
+			mi = new MenuItem();
+			mi.Header = "(Re)Start the _Game";
+			mi.Click += MenuItem_OnClickRestartGame;
+			contextMenuItems.Add(mi);
+			
+			mi = new MenuItem();
+			mi.Header = "Remove _Test Mod";
+			mi.Click += Menu_OnClickRemoveTestMod;
+			contextMenuItems.Add(mi);
+			
+			mi = new MenuItem();
+			mi.Header = "_Exit";
+			mi.Click += Menu_OnClickExit;
+			contextMenuItems.Add(mi);
+		}
+
 		private void LvModsList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			if (e.ChangedButton != MouseButton.Left) {
@@ -674,5 +776,6 @@ namespace WorkshopTool
 		}
 
 		#endregion
+		
 	}
 }
