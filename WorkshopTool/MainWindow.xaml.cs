@@ -620,6 +620,11 @@ namespace WorkshopTool
 				MessageBoxImage.Information);
 		}
 		
+		private void MenuItem_OnClickHelp(object sender, RoutedEventArgs e)
+		{
+			App.OpenHelp();
+		}
+		
 		private void CmListViewContextMenu_OnOpened(object sender, RoutedEventArgs e)
 		{
 			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
@@ -776,6 +781,5 @@ namespace WorkshopTool
 		}
 
 		#endregion
-		
 	}
 }

@@ -244,6 +244,11 @@ namespace WorkshopTool
 			Process.Start($"steam://run/{PhoenixPointAppSteamId}");
 		}
 
+		public static void OpenHelp()
+		{
+			Process.Start("https://github.com/SnapshotGames/PPWorkshopTool");
+		}
+		
 		public static string GetProjectDistDirectory(string projectDir)
 		{
 			return Path.Combine(projectDir, "Dist");
