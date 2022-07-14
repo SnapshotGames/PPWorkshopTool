@@ -12,7 +12,9 @@ Main window looks like this:
 ![image](https://user-images.githubusercontent.com/2659777/178978945-06c3ff57-2727-4f50-99d2-44e26c8e242d.png)
 
 In this window you will see a list of the mod projects that are on your computer and also your created Steam workshop items. There are several steps in creating a mod for Phoenix Point:
+
 #### 1. Create a Mod Project
+
 Select **Project -> New Mod Project...** from the menu. The "Create New Mod Project dialog appears:
 
 ![image](https://user-images.githubusercontent.com/2659777/178980557-5761e7fc-ce50-4863-b2e8-47d9e0c96ce1.png)
@@ -32,14 +34,17 @@ Select the project from the list and select **Project -> Open Mod Project** from
 ![image](https://user-images.githubusercontent.com/2659777/178983753-9033e2a7-b153-49ef-a58c-be1d645ad6e0.png)
 
 #### 2. Edit, Build and Test The Mod Project
-The mod project contains a README.txt file that contains information how to write the mod logic and how the mods are loaded and initialized withing the game. There are comments in the project .cs files that explain some additional conceps. You can edit the project's metadata by editing the meta.js file.
+
+The mod project contains a README.txt file that contains information how to write the mod logic and how the mods are loaded and initialized withing the game. There are comments in the project .cs files that explain some additional conceps. You can edit the project's metadata by editing the meta.js file. Anything you put in the **/Data** directory within your project will go into the output folder of the project unchanged. Put your mod's config and data here. The final build of the mod is copied to the **/Dist** directory.
 Get familiar with the project, make your changes and when you are ready to test - build it using your IDE (for Visual Studio use **Build -> Build Solution** from the menu or press **F7**). The build process will deploy the mod for testing. If the game is running already you need to restart it in order for mod to be loaded. You can use the **Project -> (Re)Start the game** from the Workshop Tool menu to do that. Your mod should be visible in the game's MODS list. You can enable it by clicking in the check box next to the name:
 
 ![image](https://user-images.githubusercontent.com/2659777/178985772-9f47b363-9748-470a-94d4-7f4e9fd6883b.png)
 
 Since .NET does not support unloading of managed libraries you need to restart the game every time you make a new build for your mod. We may find a workaround for this in the future.
+When you build the project the mod and its data is copied to the following location: **%UserProfile%\AppData\LocalLow\Snapshot Games Inc\Phoenix Point\Steam\WorkshopTool\TestMod**. When the game is started if there's a mod there the game will load it. If you want to remove the current test mod you can use the **Project -> Remove Test Mod** menu item to delete everything in that directory.
 
 #### 3. Create Steam Workshop Item
+
 You need to create a Steam Workshop item before being able to upload data to Steam Workshop. Select your project from the list and then select **Workshop -> New Workshop Item..** from the menu. The "Create New Workshop Item" dialog appears. Fill in the metadata for your workshop item:
 
 ![image](https://user-images.githubusercontent.com/2659777/178986850-225f49e2-7150-477a-9ee6-d1cab518555d.png)
@@ -49,6 +54,10 @@ You need to create a Steam Workshop item before being able to upload data to Ste
 - **Thumbnail Path** - The main image of your Workshop Item. The image must be below 1MB and in .png, .jpg or .gif format.
 - **Visibility** - The initial visibility of your Workshop item.
 
-You can change everything except the thumbnail image later from the Workshop web interface. Click OK and enter a log message for this change. Those messages will be visible in the change log in your Workshop item. If everything's fine your Workshop item will be created and linked to your mod project. You can use the **Workshop -> Open Workshop Item in Steam** menu item to open your new workshop item in the Steam client.
+You can change everything except the thumbnail image later from the Workshop web interface.
+
+Click OK and enter a log message for this change. Those messages will be visible in the change log in your Workshop item. If everything's fine your Workshop item will be created and linked to your mod project. You can use the **Workshop -> Open Workshop Item in Steam** menu item to open your new workshop item in the Steam client.
 
 #### 4. Upload Data to Steam Workshop
+
+When you are ready to upload your mod to Steam Workshop select your project from the list and then select **Workshop -> Upload Data to Workshop...** from the menu. Confirm the upload and enter the change log message. Everything that's currently in your project's **/Dist** directory will be uploaded to your Steam Workshop item.
