@@ -1,0 +1,25 @@
+<Window x:Class="WorkshopTool.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:WorkshopTool"
+        mc:Ignorable="d"
+
+        Title="About"
+        SizeToContent="Height"
+        Width="250"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+    <StackPanel>
+        <Label HorizontalAlignment="Center" Margin="0,10,0,0">Phoenix Point Steam Workshop Tool</Label>
+        <Label HorizontalAlignment="Center" Margin="0,10,0,0">Copyright (c) Snapshot Games 2014</Label>
+        <Label HorizontalAlignment="Center" Margin="0,10,0,0">All Rights Reserved</Label>
+        <Button HorizontalAlignment="Center" Width="100" Margin="0,10,0,10" IsDefault="True" Click="Button_OnClickOk">OK</Button>
+    </StackPanel>
+
+</Window>

@@ -114,203 +114,6 @@ namespace WorkshopTool
 			
 			StopAsyncOperation();
 		}
-
-		private async void Menu_OnClickNewWorkshopItem(object sender, RoutedEventArgs e)
-		{
-			WorkshopItemWindow workshopItemDialog = new WorkshopItemWindow {
-				Owner = this,
-			};
-			
-			WorkshopItem selectedItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
-
-			bool workshopItemWithoutIdSelected =
-				selectedItem != null && selectedItem.FileId == 0;
-			
-			if (workshopItemWithoutIdSelected) {
-				workshopItemDialog.WorkshopItem = selectedItem;
-			}
-			
-			bool confirmed = workshopItemDialog.ShowDialog() ?? false;
-
-			if (!confirmed) {
-				return;
-			}
-			
-			StartAsyncOperation("Creating new Workshop item...");
-			PublishResult result = await workshopItemDialog.RunAsyncOperation((IProgress<float>) this);
-
-			if (!result.Success) {
-				Log.Error("Error creating Workshop item: {result.Result}");
-				
-				MessageBox.Show(
-					this,
-					$"Error creating Workshop item: {result.Result}",
-					"Error",
-					MessageBoxButton.OK,
-					MessageBoxImage.Error);
-			}
-			
-			StopAsyncOperation();
-
-			if (workshopItemDialog.WorkshopItem != null) {
-				workshopItemDialog.WorkshopItem.FileId = result.FileId;
-			}
-			
-			await RefreshWorkshopItems();
-
-			if (result.Success) {
-				SelectItemWithId(result.FileId);
-			}
-		}
-		
-		private async void MenuItem_OnClickRemoveWorkshopItem(object sender, RoutedEventArgs e)
-		{
-			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
-			
-			if (workshopItem == null || workshopItem.FileId == 0) {
-				return;
-			}
-
-			string warning = workshopItem.ProjectPath != null
-				? $"Do you want to remove '{workshopItem.Title}' from Steam Workshop? This will NOT remove the mod project from your computer.\n\nWARNING: This operation cannot be undone!"
-				: $"Do you want to remove '{workshopItem.Title}' from Steam Workshop?\n\nWARNING: This operation cannot be undone!";
-			
-			MessageBoxResult result = MessageBox.Show(
-				this,
-				warning,
-				"Remove Workshop Item",
-				MessageBoxButton.YesNo,
-				MessageBoxImage.Question);
-
-			if (result == MessageBoxResult.No) {
-				return;
-			}
-
-			bool success = await SteamUGC.DeleteFileAsync(workshopItem.FileId);
-			await RefreshWorkshopItems();
-			
-			if (!success) {
-				Log.Error($"Could not remove workshop item {workshopItem.FileId}");
-				
-				MessageBox.Show(
-					this,
-					$"Could not remove workshop item {workshopItem.FileId}",
-					"Remove Workshop Item",
-					MessageBoxButton.OK,
-					MessageBoxImage.Error);
-			}
-		}
-
-		private async void Menu_OnClickRefreshWorkshopItems(object sender, RoutedEventArgs e)
-		{
-			await RefreshWorkshopItems();
-		}
-		
-		private async void MenuItem_OnClickUploadDataToWorkshop(object sender, RoutedEventArgs e)
-		{
-			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
-			
-			if (workshopItem == null || workshopItem.FileId == 0) {
-				MessageBox.Show(
-					this,
-					"You must select a Workshop Item that's created on Steam (use 'New Workshop Item' from the 'Workshop' menu)",
-					"Wrong item selected",
-					MessageBoxButton.OK,
-					MessageBoxImage.Exclamation);
-				
-				return;
-			}
-
-			if (workshopItem.ProjectPath == null) {
-				MessageBox.Show(
-					this,
-					"You must select a Workshop Item that has a mod project associated with it (use 'New Mod Project' or 'Associate Project With Workshop Item' from the 'Project' menu)",
-					"Wrong item selected",
-					MessageBoxButton.OK,
-					MessageBoxImage.Exclamation);
-				
-				return;
-			}
-			
-			MessageBoxResult mbResult = MessageBox.Show(
-				this,
-				$"Upload data:\n\nFrom Project: {workshopItem.ProjectPath}\nTo Workshop item: {workshopItem.Title} ({workshopItem.FileId})",
-				"Upload data to Workshop",
-				MessageBoxButton.YesNo,
-				MessageBoxImage.Question);
-
-			if (mbResult != MessageBoxResult.Yes) {
-				return;
-			}
-
-			string directoryToUpload = App.GetProjectDistDirectory(workshopItem.ProjectPath);
-
-			if (!Directory.Exists(directoryToUpload) || 
-			    !Directory.EnumerateFileSystemEntries(directoryToUpload).Any()) 
-			{
-				MessageBox.Show(
-					this,
-					"The project is not built. Please build the project before uploading.",
-					"Error",
-					MessageBoxButton.OK,
-					MessageBoxImage.Error);
-				
-				return;
-			}
-			
-			var logWindow = new ChangeLogWindow {
-				Owner = this,
-			};
-				
-			bool lwResult = logWindow.ShowDialog() ?? false;
-				
-			if (!lwResult) {
-				return;
-			}
-			
-			StartAsyncOperation("Uploading data to Steam...");
-			
-			PublishResult publishResult = await 
-				new Editor(workshopItem.FileId)
-				.ForAppId(App.PhoenixPointAppSteamId)
-				.WithChangeLog(logWindow.TbLogMessage.Text.Trim())
-				.WithContent(directoryToUpload)
-				.SubmitAsync(this);
-			
-			StopAsyncOperation();
-
-			if (publishResult.Success) {
-				MessageBox.Show(
-					this,
-					$"Data uploaded successfully.",
-					"Success",
-					MessageBoxButton.OK,
-					MessageBoxImage.Information);
-			} else {
-				MessageBox.Show(
-					this,
-					$"Failed to upload data: {publishResult.Result}",
-					"Error",
-					MessageBoxButton.OK,
-					MessageBoxImage.Error);
-			}
-		}
-
-		private void Menu_OnClickOpenWorkshopItemInSteam(object sender, RoutedEventArgs e)
-		{
-			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
-			
-			if (workshopItem == null || workshopItem.FileId == 0) {
-				return;
-			}
-
-			App.OpenItemPageInSteam(workshopItem.FileId);
-		}
-
-		private void Menu_OnClickExit(object sender, RoutedEventArgs e)
-		{
-			Application.Current.Shutdown();
-		}
 		
 		private async void Menu_OnClickNewModProject(object sender, RoutedEventArgs e)
 		{
@@ -619,10 +422,217 @@ namespace WorkshopTool
 				MessageBoxButton.OK,
 				MessageBoxImage.Information);
 		}
+
+		private void Menu_OnClickExit(object sender, RoutedEventArgs e)
+		{
+			Application.Current.Shutdown();
+		}
+
+		private async void Menu_OnClickNewWorkshopItem(object sender, RoutedEventArgs e)
+		{
+			WorkshopItemWindow workshopItemDialog = new WorkshopItemWindow {
+				Owner = this,
+			};
+			
+			WorkshopItem selectedItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
+
+			bool workshopItemWithoutIdSelected =
+				selectedItem != null && selectedItem.FileId == 0;
+			
+			if (workshopItemWithoutIdSelected) {
+				workshopItemDialog.WorkshopItem = selectedItem;
+			}
+			
+			bool confirmed = workshopItemDialog.ShowDialog() ?? false;
+
+			if (!confirmed) {
+				return;
+			}
+			
+			StartAsyncOperation("Creating new Workshop item...");
+			PublishResult result = await workshopItemDialog.RunAsyncOperation((IProgress<float>) this);
+
+			if (!result.Success) {
+				Log.Error("Error creating Workshop item: {result.Result}");
+				
+				MessageBox.Show(
+					this,
+					$"Error creating Workshop item: {result.Result}",
+					"Error",
+					MessageBoxButton.OK,
+					MessageBoxImage.Error);
+			}
+			
+			StopAsyncOperation();
+
+			if (workshopItemDialog.WorkshopItem != null) {
+				workshopItemDialog.WorkshopItem.FileId = result.FileId;
+			}
+			
+			await RefreshWorkshopItems();
+
+			if (result.Success) {
+				SelectItemWithId(result.FileId);
+			}
+		}
+		
+		private async void MenuItem_OnClickRemoveWorkshopItem(object sender, RoutedEventArgs e)
+		{
+			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
+			
+			if (workshopItem == null || workshopItem.FileId == 0) {
+				return;
+			}
+
+			string warning = workshopItem.ProjectPath != null
+				? $"Do you want to remove '{workshopItem.Title}' from Steam Workshop? This will NOT remove the mod project from your computer.\n\nWARNING: This operation cannot be undone!"
+				: $"Do you want to remove '{workshopItem.Title}' from Steam Workshop?\n\nWARNING: This operation cannot be undone!";
+			
+			MessageBoxResult result = MessageBox.Show(
+				this,
+				warning,
+				"Remove Workshop Item",
+				MessageBoxButton.YesNo,
+				MessageBoxImage.Question);
+
+			if (result == MessageBoxResult.No) {
+				return;
+			}
+
+			bool success = await SteamUGC.DeleteFileAsync(workshopItem.FileId);
+			await RefreshWorkshopItems();
+			
+			if (!success) {
+				Log.Error($"Could not remove workshop item {workshopItem.FileId}");
+				
+				MessageBox.Show(
+					this,
+					$"Could not remove workshop item {workshopItem.FileId}",
+					"Remove Workshop Item",
+					MessageBoxButton.OK,
+					MessageBoxImage.Error);
+			}
+		}
+
+		private async void Menu_OnClickRefreshWorkshopItems(object sender, RoutedEventArgs e)
+		{
+			await RefreshWorkshopItems();
+		}
+		
+		private async void MenuItem_OnClickUploadDataToWorkshop(object sender, RoutedEventArgs e)
+		{
+			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
+			
+			if (workshopItem == null || workshopItem.FileId == 0) {
+				MessageBox.Show(
+					this,
+					"You must select a Workshop Item that's created on Steam (use 'New Workshop Item' from the 'Workshop' menu)",
+					"Wrong item selected",
+					MessageBoxButton.OK,
+					MessageBoxImage.Exclamation);
+				
+				return;
+			}
+
+			if (workshopItem.ProjectPath == null) {
+				MessageBox.Show(
+					this,
+					"You must select a Workshop Item that has a mod project associated with it (use 'New Mod Project' or 'Associate Project With Workshop Item' from the 'Project' menu)",
+					"Wrong item selected",
+					MessageBoxButton.OK,
+					MessageBoxImage.Exclamation);
+				
+				return;
+			}
+			
+			MessageBoxResult mbResult = MessageBox.Show(
+				this,
+				$"Upload data:\n\nFrom Project: {workshopItem.ProjectPath}\nTo Workshop item: {workshopItem.Title} ({workshopItem.FileId})",
+				"Upload data to Workshop",
+				MessageBoxButton.YesNo,
+				MessageBoxImage.Question);
+
+			if (mbResult != MessageBoxResult.Yes) {
+				return;
+			}
+
+			string directoryToUpload = App.GetProjectDistDirectory(workshopItem.ProjectPath);
+
+			if (!Directory.Exists(directoryToUpload) || 
+			    !Directory.EnumerateFileSystemEntries(directoryToUpload).Any()) 
+			{
+				MessageBox.Show(
+					this,
+					"The project is not built. Please build the project before uploading.",
+					"Error",
+					MessageBoxButton.OK,
+					MessageBoxImage.Error);
+				
+				return;
+			}
+			
+			var logWindow = new ChangeLogWindow {
+				Owner = this,
+			};
+				
+			bool lwResult = logWindow.ShowDialog() ?? false;
+				
+			if (!lwResult) {
+				return;
+			}
+			
+			StartAsyncOperation("Uploading data to Steam...");
+			
+			PublishResult publishResult = await 
+				new Editor(workshopItem.FileId)
+				.ForAppId(App.PhoenixPointAppSteamId)
+				.WithChangeLog(logWindow.TbLogMessage.Text.Trim())
+				.WithContent(directoryToUpload)
+				.SubmitAsync(this);
+			
+			StopAsyncOperation();
+
+			if (publishResult.Success) {
+				MessageBox.Show(
+					this,
+					$"Data uploaded successfully.",
+					"Success",
+					MessageBoxButton.OK,
+					MessageBoxImage.Information);
+			} else {
+				MessageBox.Show(
+					this,
+					$"Failed to upload data: {publishResult.Result}",
+					"Error",
+					MessageBoxButton.OK,
+					MessageBoxImage.Error);
+			}
+		}
+
+		private void Menu_OnClickOpenWorkshopItemInSteam(object sender, RoutedEventArgs e)
+		{
+			WorkshopItem workshopItem = ((ListViewItem) LvModsList.SelectedItem)?.WorkshopItem;
+			
+			if (workshopItem == null || workshopItem.FileId == 0) {
+				return;
+			}
+
+			App.OpenItemPageInSteam(workshopItem.FileId);
+		}
 		
 		private void MenuItem_OnClickHelp(object sender, RoutedEventArgs e)
 		{
 			App.OpenHelp();
+		}
+		
+		private void MenuItem_OnClickReportIssues(object sender, RoutedEventArgs e)
+		{
+			App.OpenReportIssues();
+		}
+		
+		private void MenuItem_OnClickAbout(object sender, RoutedEventArgs e)
+		{
+			new AboutWindow().ShowDialog();
 		}
 		
 		private void CmListViewContextMenu_OnOpened(object sender, RoutedEventArgs e)

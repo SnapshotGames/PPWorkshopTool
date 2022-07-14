@@ -13,16 +13,6 @@
 
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
-			<MenuItem Header="_Workshop">
-				<MenuItem Header="_New Workshop Item..." Click="Menu_OnClickNewWorkshopItem"/>
-				<MenuItem Header="_Remove Workshop Item" Click="MenuItem_OnClickRemoveWorkshopItem"/>
-				<Separator />
-				<MenuItem Header="_Refresh List" Click="Menu_OnClickRefreshWorkshopItems"/>
-				<MenuItem Header="_Upload Data to Workshop..." Click="MenuItem_OnClickUploadDataToWorkshop"/>
-				<MenuItem Header="_Open Workshop Item in Steam" Click="Menu_OnClickOpenWorkshopItemInSteam"/>
-				<Separator />
-				<MenuItem Header="_Exit" Click="Menu_OnClickExit"/>
-			</MenuItem>
 			<MenuItem Header="_Project">
 				<MenuItem Header="_New Mod Project..." Click="Menu_OnClickNewModProject"/>
 				<MenuItem Header="_Remove Mod Project" Click="MenuItem_OnClickRemoveModProject"/>
@@ -34,11 +24,22 @@
 				<Separator />
 				<MenuItem Header="(Re)Start the _Game" Click="MenuItem_OnClickRestartGame"/>
 				<MenuItem Header="Remove _Test Mod" Click="Menu_OnClickRemoveTestMod"/>
+				<Separator />
+				<MenuItem Header="_Exit" Click="Menu_OnClickExit"/>
+			</MenuItem>
+			<MenuItem Header="_Workshop">
+				<MenuItem Header="_New Workshop Item..." Click="Menu_OnClickNewWorkshopItem"/>
+				<MenuItem Header="_Remove Workshop Item" Click="MenuItem_OnClickRemoveWorkshopItem"/>
+				<Separator />
+				<MenuItem Header="_Refresh List" Click="Menu_OnClickRefreshWorkshopItems"/>
+				<MenuItem Header="_Upload Data to Workshop..." Click="MenuItem_OnClickUploadDataToWorkshop"/>
+				<MenuItem Header="_Open Workshop Item in Steam" Click="Menu_OnClickOpenWorkshopItemInSteam"/>
 			</MenuItem>
 			<MenuItem Header="_Help">
 				<MenuItem Header="_Help" Click="MenuItem_OnClickHelp"/>
+				<MenuItem Header="_Report Issues" Click="MenuItem_OnClickReportIssues"/>
 				<Separator />
-				<MenuItem Header="_About"/>
+				<MenuItem Header="_About" Click="MenuItem_OnClickAbout"/>
 			</MenuItem>
 		</Menu>
 
@@ -55,7 +56,7 @@
 		<ListView Name="LvModsList" Margin="5" SelectionMode="Single" MouseDoubleClick="LvModsList_OnMouseDoubleClick">
 			<ListView.View>
 				<GridView>
-					<GridViewColumn Header="ID" Width="100" DisplayMemberBinding="{Binding LvFileId}" />
+					<GridViewColumn Header="Workshop ID" Width="100" DisplayMemberBinding="{Binding LvFileId}" />
 					<GridViewColumn Header="Title" Width="200" DisplayMemberBinding="{Binding LvTitle}" />
 					<GridViewColumn Header="Project Path" Width="330" DisplayMemberBinding="{Binding LvProjectPath}"/>
 				</GridView>

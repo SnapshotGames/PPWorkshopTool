@@ -249,6 +249,11 @@ namespace WorkshopTool
 			Process.Start("https://github.com/SnapshotGames/PPWorkshopTool");
 		}
 		
+		public static void OpenReportIssues()
+		{
+			Process.Start("https://github.com/SnapshotGames/PPWorkshopTool/issues");
+		}
+		
 		public static string GetProjectDistDirectory(string projectDir)
 		{
 			return Path.Combine(projectDir, "Dist");
