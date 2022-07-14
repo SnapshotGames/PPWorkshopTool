@@ -15,7 +15,7 @@ In this window you will see a list of the mod projects that are on your computer
 
 #### 1. Create a Mod Project
 
-Select **Project -> New Mod Project...** from the menu. The "Create New Mod Project dialog appears:
+Select **Project -> New Mod Project...** from the menu. The "Create New Mod Project" dialog appears:
 
 ![image](https://user-images.githubusercontent.com/2659777/178980557-5761e7fc-ce50-4863-b2e8-47d9e0c96ce1.png)
 
@@ -23,24 +23,28 @@ Fill in the metadata for your mod project. You can change everything later if yo
 
 - **Id** - The id of the mod. This is used to identify your mod. If some other mod depends on your mod the dependency will be tracked by this id. You shouldn't change this once you upload your mod to Steam Workshop
 - **Name, Author, Description** - The name, author and description of the mod that will be shown in Phoenix Point when the mod is installed
-- **Project Path** - The directory in which the mod project will be created. The mod project will be in a subdirectory within the Project Path
+- **Project Path** - The directory in which the mod project will be created. The mod project will be created in a subdirectory within the Project Path
 
 Click OK and the mod project will be created and added to the list:
 
 ![image](https://user-images.githubusercontent.com/2659777/178981667-eb39beeb-8219-43a0-877f-3bbb51290bdb.png)
 
-Select the project from the list and select **Project -> Open Mod Project** from the menu. This will open the project solution file (.sln) in the default program that's associated with it:
+Select the project from the list and select **Project -> Open Mod Project** from the menu. This will open the project solution file (.sln) in the default application that's associated with it:
 
 ![image](https://user-images.githubusercontent.com/2659777/178983753-9033e2a7-b153-49ef-a58c-be1d645ad6e0.png)
 
 #### 2. Edit, Build and Test The Mod Project
 
-The mod project contains a README.txt file that contains information how to write the mod logic and how the mods are loaded and initialized withing the game. There are comments in the project .cs files that explain some additional conceps. You can edit the project's metadata by editing the meta.js file. Anything you put in the **/Data** directory within your project will go into the output folder of the project unchanged. Put your mod's config and data here. The final build of the mod is copied to the **/Dist** directory.
-Get familiar with the project, make your changes and when you are ready to test - build it using your IDE (for Visual Studio use **Build -> Build Solution** from the menu or press **F7**). The build process will deploy the mod for testing. If the game is running already you need to restart it in order for mod to be loaded. You can use the **Project -> (Re)Start the game** from the Workshop Tool menu to do that. Your mod should be visible in the game's MODS list. You can enable it by clicking in the check box next to the name:
+The mod project contains a README.txt file that contains information how to write the mod logic and how the mods are loaded and initialized withing the game. There are comments in the project .cs files that explain some additional conceps. You can edit the project's metadata by editing the meta.js file. 
+
+Anything you put in the **/Data** directory within your project will go into the output folder of the project unchanged. Put your mod's config and data here. The final build of the mod is copied to the **/Dist** directory.
+
+Get familiar with the project, make your changes and when you are ready to test - build it using your IDE (for Visual Studio use **Build -> Build Solution** from the menu or press **F7**). The build process will deploy the mod for testing. If the game is running already you need to restart it in order for the mod to be loaded. You can use the **Project -> (Re)Start the game** from the Workshop Tool menu to do that. Your mod should be visible in the game's MODS list. You can enable it by clicking in the check box next to the name:
 
 ![image](https://user-images.githubusercontent.com/2659777/178985772-9f47b363-9748-470a-94d4-7f4e9fd6883b.png)
 
 Since .NET does not support unloading of managed libraries you need to restart the game every time you make a new build for your mod. We may find a workaround for this in the future.
+
 When you build the project the mod and its data is copied to the following location: **%UserProfile%\AppData\LocalLow\Snapshot Games Inc\Phoenix Point\Steam\WorkshopTool\TestMod**. When the game is started if there's a mod there the game will load it. If you want to remove the current test mod you can use the **Project -> Remove Test Mod** menu item to delete everything in that directory.
 
 #### 3. Create Steam Workshop Item
